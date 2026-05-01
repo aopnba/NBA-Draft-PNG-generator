@@ -1,5 +1,7 @@
 "use strict";
 
+const ASSET_VERSION = "20260430c";
+
 const DATA_SOURCES = {
   players: "data/players.json",
   teamColors: "data/team-colors.json",
@@ -115,7 +117,7 @@ function sortPlayers(left, right) {
 }
 
 async function fetchJson(path) {
-  const response = await fetch(path);
+  const response = await fetch(withVersion(path), { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`Failed to fetch ${path}`);
   }
@@ -131,7 +133,7 @@ function loadImage(source) {
     const image = new Image();
     image.onload = () => resolve(image);
     image.onerror = () => reject(new Error(`Failed to load image: ${source}`));
-    image.src = source;
+    image.src = withVersion(source);
   });
 }
 
@@ -597,6 +599,11 @@ function pickHighlightColor(entry) {
   }
 
   return candidates[0] || DEFAULT_COLORS.accent;
+}
+
+function withVersion(path) {
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}v=${ASSET_VERSION}`;
 }
 
 function colorBrightness(hexColor) {
