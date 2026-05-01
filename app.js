@@ -13,7 +13,7 @@ const IMAGE_SOURCES = {
 
 const DEFAULT_COLORS = {
   accent: "#0062B8",
-  shadow: "#002E5D"
+  shadow: "#0062B8"
 };
 
 const CANVAS_SIZE = {
@@ -22,7 +22,6 @@ const CANVAS_SIZE = {
 };
 
 const LAYOUT = {
-  woodPanel: { x: 596, y: 0, width: 484, height: 174 },
   logo: { centerX: 842, centerY: 185, maxWidth: 220, maxHeight: 126 },
   nameCenterX: 842,
   nameStartY: 300,
@@ -247,10 +246,11 @@ function renderCard() {
   }
 
   if (state.images.overlay) {
+    context.save();
+    context.globalCompositeOperation = "screen";
     context.drawImage(state.images.overlay, 0, 0, CANVAS_SIZE.width, CANVAS_SIZE.height);
+    context.restore();
   }
-
-  restoreWoodPanel(context);
 
   if (!state.currentPlayer) {
     drawCenteredMessage(context, "LOAD A PLAYER");
@@ -269,25 +269,6 @@ function renderCard() {
   drawStatBlock(context, buildStatLine(state.currentPlayer), "PTS / REB / AST", LAYOUT.stat, colors);
   drawStatBlock(context, buildWeightDisplay(), "WEIGHT", LAYOUT.weight, colors);
   drawStatBlock(context, buildHeightDisplay(), "HEIGHT", LAYOUT.height, colors);
-}
-
-function restoreWoodPanel(context) {
-  if (!state.images.background) {
-    return;
-  }
-
-  const panel = LAYOUT.woodPanel;
-  context.drawImage(
-    state.images.background,
-    panel.x,
-    panel.y,
-    panel.width,
-    panel.height,
-    panel.x,
-    panel.y,
-    panel.width,
-    panel.height
-  );
 }
 
 function drawCenteredMessage(context, text) {
@@ -599,22 +580,23 @@ function pickTeamColors(entry) {
     return DEFAULT_COLORS;
   }
 
-  const primary = entry.primary || DEFAULT_COLORS.accent;
-  const secondary = entry.secondary || DEFAULT_COLORS.shadow;
-  const primaryBrightness = colorBrightness(primary);
-  const secondaryBrightness = colorBrightness(secondary);
+  return {
+    accent: pickHighlightColor(entry),
+    shadow: pickHighlightColor(entry)
+  };
+}
 
-  if (primaryBrightness < 0.2 && secondaryBrightness > primaryBrightness) {
-    return {
-      accent: secondary,
-      shadow: primary
-    };
+function pickHighlightColor(entry) {
+  const candidates = [entry.secondary, entry.primary, entry.accent].filter(Boolean);
+
+  for (const color of candidates) {
+    const brightness = colorBrightness(color);
+    if (brightness > 0.16 && brightness < 0.94) {
+      return color;
+    }
   }
 
-  return {
-    accent: primary,
-    shadow: secondary
-  };
+  return candidates[0] || DEFAULT_COLORS.accent;
 }
 
 function colorBrightness(hexColor) {
