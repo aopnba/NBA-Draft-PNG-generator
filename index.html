@@ -9,12 +9,7 @@
 </head>
 <body>
   <header class="page-header">
-    <p class="eyebrow">GitHub Pages Generator</p>
     <h1>NBA Draft Card Builder</h1>
-    <p class="intro">
-      Search for a player, fine-tune height and weight if needed, then export a PNG that uses your real
-      background, white-line overlay, team logo, and school colors.
-    </p>
   </header>
 
   <main class="app-shell">
@@ -32,26 +27,6 @@
 
       <div class="details-grid">
         <label class="field">
-          <span>Team</span>
-          <input id="player-team" type="text" readonly>
-        </label>
-
-        <label class="field">
-          <span>Position</span>
-          <input id="player-position" type="text" readonly>
-        </label>
-
-        <label class="field">
-          <span>Overall Rank</span>
-          <input id="player-rank" type="text" readonly>
-        </label>
-
-        <label class="field field-wide">
-          <span>PTS / REB / AST</span>
-          <input id="player-stats" type="text" readonly>
-        </label>
-
-        <label class="field">
           <span>Weight (lbs)</span>
           <input id="player-weight" type="number" min="0" step="1" inputmode="numeric">
         </label>
@@ -68,20 +43,12 @@
       </div>
 
       <p id="status" class="status">Loading players and design assets...</p>
-      <p id="logo-status" class="subtle"></p>
-      <p class="subtle">
-        The renderer uses the project layers directly:
-        <code>background.png</code> first, then <code>White Lines.png</code>, then logo and text.
-      </p>
     </section>
 
     <section class="panel preview-panel">
       <div class="preview-frame">
         <canvas id="card-canvas" width="1080" height="1350" aria-label="Generated NBA draft card preview"></canvas>
       </div>
-      <p class="preview-note">
-        Preview is scaled down on the page, but downloads at the full 1080 x 1350 size used by the sample.
-      </p>
     </section>
   </main>
 </body>

@@ -22,7 +22,8 @@ const CANVAS_SIZE = {
 };
 
 const LAYOUT = {
-  logo: { x: 670, y: 40, width: 260, height: 170 },
+  woodPanel: { x: 596, y: 0, width: 484, height: 174 },
+  logo: { centerX: 842, centerY: 185, maxWidth: 220, maxHeight: 126 },
   nameCenterX: 842,
   nameStartY: 300,
   nameLineGap: 88,
@@ -38,16 +39,11 @@ const refs = {
   form: document.getElementById("player-form"),
   search: document.getElementById("player-search"),
   datalist: document.getElementById("player-options"),
-  team: document.getElementById("player-team"),
-  position: document.getElementById("player-position"),
-  rank: document.getElementById("player-rank"),
-  stats: document.getElementById("player-stats"),
   weight: document.getElementById("player-weight"),
   height: document.getElementById("player-height"),
   reset: document.getElementById("reset-overrides"),
   download: document.getElementById("download-card"),
   status: document.getElementById("status"),
-  logoStatus: document.getElementById("logo-status"),
   canvas: document.getElementById("card-canvas")
 };
 
@@ -58,6 +54,7 @@ const state = {
   logoAliases: {},
   images: {},
   logoCache: new Map(),
+  logoBoundsCache: new Map(),
   currentPlayer: null,
   currentLogo: null
 };
@@ -198,10 +195,6 @@ function selectPlayer(player) {
   state.currentPlayer = player;
   state.currentLogo = null;
   refs.search.value = player.name;
-  refs.team.value = player.team || "";
-  refs.position.value = player.position || "";
-  refs.rank.value = player.rank != null ? String(player.rank) : "";
-  refs.stats.value = buildStatLine(player);
   refs.weight.value = player.weightLbs ?? "";
   refs.height.value = formatHeightDisplay(player.heightInches);
   renderCard();
@@ -222,12 +215,9 @@ async function loadCurrentLogo(team) {
   const filename = state.logoAliases[team];
   if (!filename) {
     state.currentLogo = null;
-    refs.logoStatus.textContent = `No logo file is mapped yet for ${team}.`;
     renderCard();
     return;
   }
-
-  refs.logoStatus.textContent = `Using logo asset: ${filename}`;
 
   if (state.logoCache.has(filename)) {
     state.currentLogo = state.logoCache.get(filename);
@@ -243,7 +233,6 @@ async function loadCurrentLogo(team) {
     console.error(error);
     state.logoCache.set(filename, null);
     state.currentLogo = null;
-    refs.logoStatus.textContent = `The mapped logo file could not be loaded: ${filename}`;
   }
 
   renderCard();
@@ -260,6 +249,8 @@ function renderCard() {
   if (state.images.overlay) {
     context.drawImage(state.images.overlay, 0, 0, CANVAS_SIZE.width, CANVAS_SIZE.height);
   }
+
+  restoreWoodPanel(context);
 
   if (!state.currentPlayer) {
     drawCenteredMessage(context, "LOAD A PLAYER");
@@ -280,6 +271,25 @@ function renderCard() {
   drawStatBlock(context, buildHeightDisplay(), "HEIGHT", LAYOUT.height, colors);
 }
 
+function restoreWoodPanel(context) {
+  if (!state.images.background) {
+    return;
+  }
+
+  const panel = LAYOUT.woodPanel;
+  context.drawImage(
+    state.images.background,
+    panel.x,
+    panel.y,
+    panel.width,
+    panel.height,
+    panel.x,
+    panel.y,
+    panel.width,
+    panel.height
+  );
+}
+
 function drawCenteredMessage(context, text) {
   context.save();
   context.textAlign = "center";
@@ -291,13 +301,61 @@ function drawCenteredMessage(context, text) {
 
 function drawLogo(context, image, bounds) {
   context.save();
-  const scale = Math.min(bounds.width / image.width, bounds.height / image.height);
-  const width = image.width * scale;
-  const height = image.height * scale;
-  const x = bounds.x + (bounds.width - width) / 2;
-  const y = bounds.y + (bounds.height - height) / 2;
-  context.drawImage(image, x, y, width, height);
+  const source = getOpaqueImageBounds(image);
+  const scale = Math.min(bounds.maxWidth / source.width, bounds.maxHeight / source.height);
+  const width = source.width * scale;
+  const height = source.height * scale;
+  const x = bounds.centerX - (width / 2);
+  const y = bounds.centerY - (height / 2);
+  context.drawImage(image, source.x, source.y, source.width, source.height, x, y, width, height);
   context.restore();
+}
+
+function getOpaqueImageBounds(image) {
+  const cacheKey = image.currentSrc || image.src;
+  if (state.logoBoundsCache.has(cacheKey)) {
+    return state.logoBoundsCache.get(cacheKey);
+  }
+
+  const canvas = document.createElement("canvas");
+  const width = image.naturalWidth || image.width;
+  const height = image.naturalHeight || image.height;
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  context.drawImage(image, 0, 0, width, height);
+
+  const { data } = context.getImageData(0, 0, width, height);
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const alpha = data[((y * width) + x) * 4 + 3];
+      if (alpha === 0) {
+        continue;
+      }
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    }
+  }
+
+  const bounds = maxX === -1
+    ? { x: 0, y: 0, width, height }
+    : {
+        x: minX,
+        y: minY,
+        width: (maxX - minX) + 1,
+        height: (maxY - minY) + 1
+      };
+
+  state.logoBoundsCache.set(cacheKey, bounds);
+  return bounds;
 }
 
 function drawFallbackTeamText(context, team, colors) {

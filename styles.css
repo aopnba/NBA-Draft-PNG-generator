@@ -43,31 +43,15 @@ body {
 .page-header {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 1rem;
-}
-
-.eyebrow {
-  margin: 0 0 0.5rem;
-  color: var(--accent);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-size: 0.9rem;
+  padding: 1.8rem 1.5rem 0.8rem;
 }
 
 .page-header h1 {
   margin: 0;
   font-family: "Born Strong", Impact, sans-serif;
-  font-size: clamp(2.6rem, 5vw, 4.4rem);
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-}
-
-.intro {
-  max-width: 62rem;
-  margin: 0.9rem 0 0;
-  color: var(--muted);
-  line-height: 1.6;
-  font-size: 1rem;
 }
 
 .app-shell {
@@ -93,7 +77,7 @@ body {
 }
 
 .search-form {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .field {
@@ -170,21 +154,10 @@ button:hover {
   flex: 1;
 }
 
-.status,
-.subtle,
-.preview-note {
+.status {
   margin: 1rem 0 0;
   line-height: 1.5;
-}
-
-.status {
   color: var(--text);
-}
-
-.subtle,
-.preview-note {
-  color: var(--muted);
-  font-size: 0.92rem;
 }
 
 .preview-panel {
