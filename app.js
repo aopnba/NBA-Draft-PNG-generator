@@ -1,6 +1,6 @@
 "use strict";
 
-const ASSET_VERSION = "20260430c";
+const ASSET_VERSION = "20260504a";
 
 const DATA_SOURCES = {
   players: "data/players.json",
@@ -24,6 +24,7 @@ const CANVAS_SIZE = {
 };
 
 const LAYOUT = {
+  photoCutout: { x: 0, y: 0, width: 586, height: 1350 },
   logo: { centerX: 842, centerY: 185, maxWidth: 220, maxHeight: 126 },
   nameCenterX: 842,
   nameStartY: 300,
@@ -254,6 +255,8 @@ function renderCard() {
     context.restore();
   }
 
+  clearPhotoCutout(context);
+
   if (!state.currentPlayer) {
     drawCenteredMessage(context, "LOAD A PLAYER");
     return;
@@ -271,6 +274,11 @@ function renderCard() {
   drawStatBlock(context, buildStatLine(state.currentPlayer), "PTS / REB / AST", LAYOUT.stat, colors);
   drawStatBlock(context, buildWeightDisplay(), "WEIGHT", LAYOUT.weight, colors);
   drawStatBlock(context, buildHeightDisplay(), "HEIGHT", LAYOUT.height, colors);
+}
+
+function clearPhotoCutout(context) {
+  const cutout = LAYOUT.photoCutout;
+  context.clearRect(cutout.x, cutout.y, cutout.width, cutout.height);
 }
 
 function drawCenteredMessage(context, text) {

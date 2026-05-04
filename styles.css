@@ -165,7 +165,12 @@ button:hover {
 }
 
 .preview-frame {
-  background: var(--canvas-frame);
+  background:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.06) 75%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.06) 75%),
+    var(--canvas-frame);
+  background-position: 0 0, 18px 18px, 0 0;
+  background-size: 36px 36px, 36px 36px, auto;
   border-radius: 1rem;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
