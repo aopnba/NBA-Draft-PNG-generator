@@ -1,6 +1,6 @@
 "use strict";
 
-const ASSET_VERSION = "20260504a";
+const ASSET_VERSION = "20260504b";
 
 const DATA_SOURCES = {
   players: "data/players.json",
@@ -24,6 +24,7 @@ const CANVAS_SIZE = {
 };
 
 const LAYOUT = {
+  cardRegion: { x: 586, y: 0, width: 494, height: 1350 },
   photoCutout: { x: 0, y: 0, width: 586, height: 1350 },
   logo: { centerX: 842, centerY: 185, maxWidth: 220, maxHeight: 126 },
   nameCenterX: 842,
@@ -245,13 +246,13 @@ function renderCard() {
   context.clearRect(0, 0, CANVAS_SIZE.width, CANVAS_SIZE.height);
 
   if (state.images.background) {
-    context.drawImage(state.images.background, 0, 0, CANVAS_SIZE.width, CANVAS_SIZE.height);
+    drawRegion(context, state.images.background, LAYOUT.cardRegion);
   }
 
   if (state.images.overlay) {
     context.save();
     context.globalCompositeOperation = "screen";
-    context.drawImage(state.images.overlay, 0, 0, CANVAS_SIZE.width, CANVAS_SIZE.height);
+    drawRegion(context, state.images.overlay, LAYOUT.cardRegion);
     context.restore();
   }
 
@@ -279,6 +280,20 @@ function renderCard() {
 function clearPhotoCutout(context) {
   const cutout = LAYOUT.photoCutout;
   context.clearRect(cutout.x, cutout.y, cutout.width, cutout.height);
+}
+
+function drawRegion(context, image, region) {
+  context.drawImage(
+    image,
+    region.x,
+    region.y,
+    region.width,
+    region.height,
+    region.x,
+    region.y,
+    region.width,
+    region.height
+  );
 }
 
 function drawCenteredMessage(context, text) {
