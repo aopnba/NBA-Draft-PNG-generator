@@ -1,6 +1,6 @@
 "use strict";
 
-const ASSET_VERSION = "20260504b";
+const ASSET_VERSION = "20260505a";
 
 const DATA_SOURCES = {
   players: "data/players.json",
@@ -28,12 +28,12 @@ const LAYOUT = {
   photoCutout: { x: 0, y: 0, width: 586, height: 1350 },
   logo: { centerX: 842, centerY: 185, maxWidth: 220, maxHeight: 126 },
   nameCenterX: 842,
-  nameStartY: 300,
+  nameStartY: 328,
   nameLineGap: 88,
   blockCenterX: 842,
-  stat: { valueY: 555, labelY: 620, maxWidth: 360 },
-  weight: { valueY: 820, labelY: 885, maxWidth: 300 },
-  height: { valueY: 1088, labelY: 1153, maxWidth: 260 },
+  stat: { valueY: 583, labelY: 648, maxWidth: 360 },
+  weight: { valueY: 848, labelY: 913, maxWidth: 300 },
+  height: { valueY: 1116, labelY: 1181, maxWidth: 260 },
   labelPaddingX: 24,
   labelHeight: 34
 };
@@ -392,7 +392,7 @@ function drawName(context, name) {
       family: "Born Strong",
       fillStyle: "#ffffff",
       shadowColor: "#121212",
-      letterSpacing: 4
+      letterSpacing: -2
     });
   });
 }
