@@ -1,6 +1,6 @@
 "use strict";
 
-const ASSET_VERSION = "20260505a";
+const ASSET_VERSION = "20260506a";
 
 const DATA_SOURCES = {
   players: "data/players.json",
@@ -467,8 +467,8 @@ function drawStyledText(context, options) {
   context.textBaseline = "middle";
   context.fillStyle = fillStyle;
   context.shadowColor = shadowColor;
-  context.shadowOffsetX = 6;
-  context.shadowOffsetY = 6;
+  context.shadowOffsetX = 4;
+  context.shadowOffsetY = 4;
   context.shadowBlur = 0;
 
   if (strokeStyle && strokeWidth > 0) {
@@ -612,11 +612,11 @@ function pickTeamColors(entry) {
 }
 
 function pickHighlightColor(entry) {
-  const candidates = [entry.secondary, entry.primary, entry.accent].filter(Boolean);
+  const candidates = [entry.accent, entry.primary, entry.secondary].filter(Boolean);
 
   for (const color of candidates) {
     const brightness = colorBrightness(color);
-    if (brightness > 0.16 && brightness < 0.94) {
+    if (brightness > 0.18 && brightness < 0.9) {
       return color;
     }
   }
