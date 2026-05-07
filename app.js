@@ -1,6 +1,6 @@
 "use strict";
 
-const ASSET_VERSION = "20260506a";
+const ASSET_VERSION = "20260507a";
 
 const DATA_SOURCES = {
   players: "data/players.json",
@@ -510,7 +510,7 @@ function strokeSpacedText(context, text, centerX, centerY, letterSpacing) {
 }
 
 function splitNameIntoLines(name) {
-  const tokens = name.toUpperCase().split(/\s+/).filter(Boolean);
+  const tokens = mergeNameSuffixes(name.toUpperCase().split(/\s+/).filter(Boolean));
   if (tokens.length <= 1) {
     return tokens;
   }
@@ -538,6 +538,22 @@ function splitNameIntoLines(name) {
 
   candidates.sort((left, right) => lineBalanceScore(left) - lineBalanceScore(right));
   return candidates[0];
+}
+
+function mergeNameSuffixes(tokens) {
+  const suffixes = new Set(["JR", "JR.", "SR", "SR.", "II", "III", "IV", "V"]);
+  const merged = [];
+
+  for (const token of tokens) {
+    if (merged.length > 0 && suffixes.has(token)) {
+      merged[merged.length - 1] = `${merged[merged.length - 1]} ${token}`;
+      continue;
+    }
+
+    merged.push(token);
+  }
+
+  return merged;
 }
 
 function lineBalanceScore(lines) {
