@@ -1,6 +1,6 @@
 "use strict";
 
-const ASSET_VERSION = "20260507a";
+const ASSET_VERSION = "20260514a";
 
 const DATA_SOURCES = {
   players: "data/players.json",
@@ -198,8 +198,8 @@ function selectPlayer(player) {
   state.currentPlayer = player;
   state.currentLogo = null;
   refs.search.value = player.name;
-  refs.weight.value = player.weightLbs ?? "";
-  refs.height.value = formatHeightDisplay(player.heightInches);
+  refs.weight.value = formatWeightInput(player.weightLbs, player.weightDisplay);
+  refs.height.value = formatHeightInput(player.heightInches, player.heightDisplay);
   renderCard();
   void loadCurrentLogo(player.team);
 }
@@ -208,8 +208,8 @@ function resetOverrides() {
   if (!state.currentPlayer) {
     return;
   }
-  refs.weight.value = state.currentPlayer.weightLbs ?? "";
-  refs.height.value = formatHeightDisplay(state.currentPlayer.heightInches);
+  refs.weight.value = formatWeightInput(state.currentPlayer.weightLbs, state.currentPlayer.weightDisplay);
+  refs.height.value = formatHeightInput(state.currentPlayer.heightInches, state.currentPlayer.heightDisplay);
   refs.status.textContent = `Reset height and weight back to the spreadsheet values for ${state.currentPlayer.name}.`;
   renderCard();
 }
@@ -573,7 +573,7 @@ function buildWeightDisplay() {
   if (!value) {
     return "--LBS";
   }
-  return `${value}LBS`;
+  return `${normalizeNumberText(value)}LBS`;
 }
 
 function buildHeightDisplay() {
@@ -603,8 +603,36 @@ function formatHeightDisplay(totalInches) {
     return "";
   }
   const feet = Math.floor(totalInches / 12);
-  const inches = totalInches % 12;
-  return `${feet}'${inches}"`;
+  const inches = totalInches - (feet * 12);
+  return `${feet}'${normalizeNumberText(inches)}"`;
+}
+
+function formatHeightInput(heightInches, heightDisplay) {
+  if (heightDisplay) {
+    return heightDisplay;
+  }
+  return formatHeightDisplay(heightInches);
+}
+
+function formatWeightInput(weightLbs, weightDisplay) {
+  if (weightDisplay) {
+    return weightDisplay;
+  }
+  if (typeof weightLbs !== "number" || Number.isNaN(weightLbs)) {
+    return "";
+  }
+  return normalizeNumberText(weightLbs);
+}
+
+function normalizeNumberText(value) {
+  const numeric = typeof value === "number" ? value : Number.parseFloat(String(value));
+  if (!Number.isFinite(numeric)) {
+    return String(value).trim();
+  }
+  if (Number.isInteger(numeric)) {
+    return String(numeric);
+  }
+  return numeric.toFixed(2).replace(/0+$/g, "").replace(/\.$/, "");
 }
 
 function normalizeText(value) {
